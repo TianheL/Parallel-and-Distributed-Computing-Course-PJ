@@ -4,7 +4,7 @@ Course PJ of Parallel and Distributed Computing
 Choose two out of the following three projects to complete. I choose the first two, since i don't find suitable test data and i am too lazy to generate test data by myself.😜
 
 ## TODO
-- [ ] Upload code.
+- [ ] Upload code.(Next month since the course has not ended yet.)
 - [ ] Translate to English.
 
 ## PJ-1 OpenMP编程实现并行快速排序算法
