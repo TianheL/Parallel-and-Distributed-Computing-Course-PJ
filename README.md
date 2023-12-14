@@ -12,7 +12,7 @@ Course PJ of Parallel and Distributed Computing
 详情实现，实验方法以及结果请参考[pj2.md](PJ2-MPI-PSRS/pj2.md)
 
 
-## 使用Hadoop框架MapReduce编程模型实现WordCount算法
+## PJ-3 使用Hadoop框架MapReduce编程模型实现WordCount算法
 
 
 
