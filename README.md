@@ -269,6 +269,7 @@ MPI_Reduce(&time_cost_parallel,&maxTime,1,MPI_DOUBLE,MPI_MAX,
 4. 在数据量较大的时候，并行算法展现出了非常大的优势，在16线程、10M数据量的情况下，加速比甚至达到了5。此外，PSRS算法的效率也很高，在2/4线程、10M数据量下，加速比十分接近于线程数，这说明了选取合适主元的重要性。
 
 
+## 使用Hadoop框架MapReduce编程模型实现WordCount算法
 
 
 
