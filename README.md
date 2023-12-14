@@ -1,5 +1,6 @@
 # Parallel-and-Distributed-Computing-Course-PJ
 Course PJ of Parallel and Distributed Computing 
+Choose two out of the following three projects to complete. I choose the first two, since i don't find suitable test data and i am too lazy to generate test data by myself.😜
 
 ## TODO
 - [ ] Upload code.
@@ -17,7 +18,8 @@ Course PJ of Parallel and Distributed Computing
 
 
 ## PJ-3 使用Hadoop框架MapReduce编程模型实现WordCount算法
-安装Hadoop有点麻烦，可以通过[已安装Hadoop的Ubuntu镜像](https://dblab.xmu.edu.cn/blog/1645/)免安装使用
+安装Hadoop有点麻烦，可以通过[已安装Hadoop的Ubuntu镜像](https://dblab.xmu.edu.cn/blog/1645/)免安装使用。
+由于没有合适的测试数据集，暂时没有去进行完成
 
 
 
