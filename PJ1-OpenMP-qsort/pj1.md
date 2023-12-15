@@ -87,6 +87,24 @@ duration=chrono::duration_cast<chrono::microseconds>(end-start);
 time_cost_parallel+=double(duration.count());
 ```
 
+可通过以下命令进行编译
+```
+g++ lab1-1.cpp -o lab1-1 -fopenmp
+g++ lab1-2.cpp -o lab1-2 -fopenmp
+```
+
+### 单轮测试
+```
+./lab1-1 {线程数} {数组长度}
+./lab1-2 {线程数} {数组长度}
+```
+
+### 多轮测试
+```
+bash lab2-1.sh
+bash lab2-2.sh
+```
+
 ## 实验环境
 我们的实验环境如下图所示。
 |    CPU    | Intel(R) Core(TM) i7-10700K CPU @ 3.80GHz |
