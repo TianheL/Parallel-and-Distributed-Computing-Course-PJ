@@ -132,8 +132,7 @@ delete []recvbuf;
 ## 实验方法
 我们同样使用chrono库进行微秒级定时，并跑500次取平均。对于多进程，我们使用MPI\_Reduce获取用时最长进程的耗时以得到正确的耗时。
 ```cpp
-MPI_Reduce(&time_cost_parallel,&maxTime,1,MPI_DOUBLE,MPI_MAX,
-           0,MPI_COMM_WORLD);
+MPI_Reduce(&time_cost_parallel,&maxTime,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
   ```
 我们观察到在nprocs等于16时，只利用根进程进行快速排序时与不用mpi的环境中进行串行排序时间差距较大，因此我们另外使用一个不用mpi编程的串行排序作为基准计算加速比。
 
