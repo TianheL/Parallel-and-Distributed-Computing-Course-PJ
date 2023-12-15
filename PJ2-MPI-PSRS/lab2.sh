@@ -7,7 +7,7 @@ total_sum1=0
 total_sum2=0
 total_sum3=0
 
-for ((i=0; i<100; i++))
+for ((i=0; i<500; i++))
 do
     output=$(mpirun -n $nprocs ./lab2-test $N $i)
     num1=$(echo $output | awk '{print $1}')  # 提取第一行数字
