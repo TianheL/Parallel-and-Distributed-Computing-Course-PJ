@@ -10,16 +10,16 @@ total_sum3=0
 for ((i=0; i<500; i++))
 do
     output=$(mpirun -n $nprocs ./lab2-test $N $i)
-    num1=$(echo $output | awk '{print $1}')  # 提取第一行数字
-    num2=$(echo $output | awk '{print $2}')  # 提取第二行数字
-    total_sum1=$((total_sum1 + num1))  # 累加第一行数字
-    total_sum2=$((total_sum2 + num2))  # 累加第二行数字
+    num1=$(echo $output | awk '{print $1}')   
+    num2=$(echo $output | awk '{print $2}')   
+    total_sum1=$((total_sum1 + num1))  # 累加单线程 
+    total_sum2=$((total_sum2 + num2))  # 累加多线程 
     output=$(./lab2-base $N $i)
     num3=$(echo $output | awk '{print $1}')
-    total_sum3=$((total_sum3 + num3))  # 累加第二行数字
+    total_sum3=$((total_sum3 + num3))  # 累加base
 done
 
-result=$(awk "BEGIN {printf \"%.2f\", $total_sum3 / $total_sum2}")  # 计算结果
+result=$(awk "BEGIN {printf \"%.2f\", $total_sum3 / $total_sum2}")  
 
 echo "N: $N"
 echo "nprocs: $nprocs"
