@@ -137,11 +137,30 @@ MPI_Reduce(&time_cost_parallel,&maxTime,1,MPI_DOUBLE,MPI_MAX,
   ```
 我们观察到在nprocs等于16时，只利用根进程进行快速排序时与不用mpi的环境中进行串行排序时间差距较大，因此我们另外使用一个不用mpi编程的串行排序作为基准计算加速比。
 
+```
+--lab2.cpp 多线程计时
+--lab2-base.cpp 用于单线程计时测试（不用mpi编程的串行排序作为基准）
+--lab2-test.cpp 用于多线程计时测试（与lab2.cpp一样，去除了部分输出，以便脚本计时）
+--lab2.sh 测试脚本
+```
+
+
 请确保已安装MPICH/OpenMPI,如果未安装可通过以下命令进行安装
 ```terminal
 sudo apt-get install mpich
 ```
 
+### 单次测试
+可以通过如下代码进行编译
+```terminal
+mpic++ -o lab2 lab2.cpp
+```
+可以通过如下代码启动测试：
+```bash
+mpirun -n {进程数} ./lab2-1 {测试数组长度} {seed}
+```
+
+### 多轮测试
 可以通过如下代码进行编译
 ```terminal
 mpic++ -o lab2-test lab2-test.cpp
