@@ -15,31 +15,44 @@ PSRS算法的简单示意图如下所示。
 在这一步中，我们利用MPI\_Scatter进行均匀划分，每一个进程获得自己需要局部排序的数据，并进行局部快速排序，最后通过正则采样采集nprocs个主元。
 ```cpp
 // 均匀划分
-MPI_Scatter(arr,mySize,MPI_INT,myArr,mySize,MPI_INT,0,
-            MPI_COMM_WORLD);
+MPI_Scatter(arr,mySize,MPI_INT,myArr,mySize,MPI_INT,0,MPI_COMM_WORLD);
 // 局部快速排序
 sort(myArr,myArr+mySize);
 // 正则采样
 for(int i=0;i<nprocs;i++)
-  sampled_pivots[i]=myArr[mySize/nprocs*i];
+sampled_pivots[i]=myArr[mySize/nprocs*i];
 ```
 
 ## Step2:归并排序正则采样数据+正则采样
 在这一步中，我们创建了一个数组，在根进程中接受每一个进程正则采样得到的主元，并对合起来的数组进行正则采样，最后通过MPI\_Bcast广播给所有进程。
 ```cpp
 // 归并排序正则采样数据
-int *merged_pivots=new int[nprocs*nprocs];//正则采样合起来的数组
-MPI_Gather(sampled_pivots,nprocs,MPI_INT,merged_pivots,nprocs,
-           MPI_INT,0,MPI_COMM_WORLD);
+int *merged_pivots=new int[nprocs*nprocs];  // 每个划分正则采样合起来的数组
+MPI_Gather(sampled_pivots,nprocs,MPI_INT,merged_pivots,nprocs,MPI_INT,0,MPI_COMM_WORLD);
 if(myId == 0){
-  for(int step=2*nprocs;step<=nprocs*nprocs;step*=2)
-    for(int i=0;i<nprocs*nprocs;i+=step)
-      Merge(merged_pivots,i,i+step/2-1,i+step-1);
-  // 正则采样  
-  for(int i=0;i<nprocs-1;i++)
-    sampled_pivots_2[i]=merged_pivots[(i+1)*nprocs];
+int *merged_pivots_2=new int[nprocs*nprocs]; // 放排好序的数组
+int *offset=new int[nprocs]; //存放指针偏移量
+memset(offset,0,sizeof(int)*nprocs);     // 清零
+for(int i=0;i<nprocs*nprocs;i++){
+int cur_min=INT_MAX; // 当前循环最小值
+int proc_id=-1;  // 当前循环最小值所属分区号
+for(int j=0;j<nprocs;j++){
+    if((offset[j]<nprocs) & (merged_pivots[j*nprocs+offset[j]]<=cur_min)){
+        cur_min=merged_pivots[j*nprocs+offset[j]];
+        proc_id=j;
+    }
 }
-MPI_Bcast(sampled_pivots_2,nprocs-1,MPI_INT,0,MPI_COMM_WORLD);
+merged_pivots_2[i]=cur_min;
+offset[proc_id]+=1;
+}
+// 正则采样  
+for(int i=0;i<nprocs-1;i++)
+sampled_pivots_2[i]=merged_pivots_2[(i+1)*nprocs];
+delete []merged_pivots_2;
+delete []offset;
+delete []merged_pivots;
+}
+MPI_Bcast(sampled_pivots_2,nprocs-1,MPI_INT,0,MPI_COMM_WORLD); 
 ```
 
 
@@ -48,32 +61,34 @@ MPI_Bcast(sampled_pivots_2,nprocs-1,MPI_INT,0,MPI_COMM_WORLD);
 ```cpp
 // 数据分区
 int proc_id=0;  // 分区所属proc
+int* sendcounts=new int[nprocs]; // 当前进程要发送给其他进程的数据块大小，第i个元素表示当前进程要发送给第i个进程的数据块大小
 memset(sendcounts,0,sizeof(int)*nprocs);     // 分区长度清零
 for(int i=0;i<mySize;i++){
-  while (proc_id<nprocs-1 & myArr[i]>sampled_pivots_2[proc_id]) 
-    proc_id+=1;     // 找到当前i所属的分区
-  if(proc_id==nprocs-1){     
-    sendcounts[nprocs-1]=mySize-i;    // 最后一个分区大小
-    break;
-  }
-  sendcounts[proc_id]++;     //i归入所属分区，分区大小+1
+while (proc_id<nprocs-1 & myArr[i]>sampled_pivots_2[proc_id]) 
+proc_id+=1;     // 找到当前i所属的分区
+if(proc_id==nprocs-1){     
+sendcounts[nprocs-1]=mySize-i;    // 最后一个分区大小
+break;
+}
+sendcounts[proc_id]++;     //i归入所属分区，分区大小+1
 }
 // 得到需要从每个进程接受的数组大小
-MPI_Alltoall(sendcounts,1,MPI_INT,recvcounts,1,MPI_INT,
-             MPI_COMM_WORLD);
+MPI_Alltoall(sendcounts,1,MPI_INT,recvcounts,1,MPI_INT,MPI_COMM_WORLD);
 for(int i=0;i<nprocs;i++) 
-  *mySize2+=recvcounts[i];
+*mySize2+=recvcounts[i];
 *myArr2=new int[*mySize2];
 // 计算发送缓冲区和接收缓冲区中每个数据块起始位置的偏移量
 int *sdispls=new int[nprocs];//表示发送缓冲区中每个数据块的偏移量,第i个元素表示当前进程要发送给第i个进程的数据块在发送缓冲区中的起始位置
 sdispls[0]=0; 
 rdispls[0]=0;
 for(int i=1;i<nprocs;i++){
-  sdispls[i]=sendcounts[i-1]+sdispls[i-1];
-  rdispls[i]=recvcounts[i-1]+rdispls[i-1];
+sdispls[i]=sendcounts[i-1]+sdispls[i-1];
+rdispls[i]=recvcounts[i-1]+rdispls[i-1];
 }
 // 分区合并
 MPI_Alltoallv(myArr,sendcounts,sdispls,MPI_INT,*myArr2,recvcounts,rdispls,MPI_INT,MPI_COMM_WORLD);
+delete []sdispls;
+delete []sendcounts;
 ```
 
 
@@ -83,32 +98,35 @@ MPI_Alltoallv(myArr,sendcounts,sdispls,MPI_INT,*myArr2,recvcounts,rdispls,MPI_IN
 // 计算每个分区结尾位置+1的位置
 int* myPartEnd=new int[nprocs]; 
 for(int i=1;i<nprocs;i++)
-  myPartEnd[i-1]=rdispls[i];
+myPartEnd[i-1]=rdispls[i];
 myPartEnd[nprocs-1]=mySize2;
 // 归并排序
 int* mySortedArr2=new int[mySize2];
 for(int i=0;i<mySize2;i++){
-  int cur_min=INT_MAX; // 当前循环最小值
-  int proc_id=-1;  // 当前循环最小值所属分区号
-  for(int j=0;j<nprocs;j++){
-    if((rdispls[j]<myPartEnd[j])&(myArr2[rdispls[j]]<=cur_min)){
-      cur_min=myArr2[rdispls[j]];
-      proc_id=j;
-    }
-  }
-  mySortedArr2[i]=cur_min;
-  rdispls[proc_id]+=1;
+int cur_min=INT_MAX; // 当前循环最小值
+int proc_id=-1;  // 当前循环最小值所属分区号
+for(int j=0;j<nprocs;j++){
+if((rdispls[j]<myPartEnd[j]) & (myArr2[rdispls[j]]<=cur_min)){
+    cur_min=myArr2[rdispls[j]];
+    proc_id=j;
 }
+}
+mySortedArr2[i]=cur_min;
+rdispls[proc_id]+=1;
+}
+delete []myPartEnd;
 // 收集排序好的数组到根进程
 int* recvbuf=new int[nprocs];  //指向根进程的缓冲区的指针,存放所有进程发送的子列表大小
 MPI_Gather(&mySize2,1,MPI_INT,recvbuf,1,MPI_INT,0,MPI_COMM_WORLD);
 // 计算根进程的接收缓冲区中每个数据块的偏移量
 if(myId == 0){
-  rdispls[0]=0;
-  for(int i=1;i<nprocs;i++)
-    rdispls[i]=recvbuf[i-1]+rdispls[i-1];
+rdispls[0]=0;
+for(int i=1;i<nprocs;i++)
+rdispls[i]=recvbuf[i-1]+rdispls[i-1];
 }
 MPI_Gatherv(mySortedArr2,mySize2,MPI_INT,arr,recvbuf,rdispls,MPI_INT,0,MPI_COMM_WORLD);
+delete []mySortedArr2;
+delete []recvbuf;
 ```
 
 ## 实验方法
@@ -118,6 +136,22 @@ MPI_Reduce(&time_cost_parallel,&maxTime,1,MPI_DOUBLE,MPI_MAX,
            0,MPI_COMM_WORLD);
   ```
 我们观察到在nprocs等于16时，只利用根进程进行快速排序时与不用mpi的环境中进行串行排序时间差距较大，因此我们另外使用一个不用mpi编程的串行排序作为基准计算加速比。
+
+请确保已安装MPICH/OpenMPI,如果未安装可通过以下命令进行安装
+```terminal
+sudo apt-get install mpich
+```
+
+可以通过如下代码进行编译
+```terminal
+mpic++ -o lab2-test lab2-test.cpp
+g++ -o lab2-base lab2-base.cpp
+```
+
+可以通过如下代码启动测试：
+```bash
+bash lab2.sh
+```
 
 ## 实验环境
 我们的实验环境如下图所示。
@@ -135,9 +169,9 @@ MPI_Reduce(&time_cost_parallel,&maxTime,1,MPI_DOUBLE,MPI_MAX,
 |        | 1K   | 5K   | 10K  | 100K | 1M   | 10M  |
 |--------|------|------|------|------|------|------|
 | 2线程   | **0.76** | 1.33 | 1.41 | 1.35 | 1.60 | 1.87 |
-| 4线程   | 0.47 | **1.64** | **2.17** | 2.03 | 2.88 | 3.41 |
-| 8线程   | 0.15 | 0.70 | 1.26 | **2.50** | 3.81 | 4.67 |
-| 16线程 | 0.05 | 0.28 | 0.38 | 1.61 | **3.85** | **5.00** |
+| 4线程   | 0.47 | **1.64** | **2.17** | 2.03 | 3.02 | 3.41 |
+| 8线程   | 0.15 | 0.70 | 1.26 | **2.50** | 3.91 | 4.67 |
+| 16线程 | 0.05 | 0.28 | 0.38 | 1.61 | **4.18** | **5.00** |
 
 从以上结果，我们可以得到如下结论：
 1. 在实验测试的数据量下，固定线程数，加速比随着数据量的增加而增加，这说明并行程序的额外开销不可忽视。
