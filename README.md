@@ -22,7 +22,7 @@ Choose two out of the following three projects to complete. I choose the first t
 由于没有合适的测试数据集，暂时没有去进行完成
 
 ## Other PJ
-You can da some extra PJ and give a presentation about your PJ to get some extra scores, like implementating Large-Scale Language Model Computation using MapReduce Framework, Parallel Matrix Multiplication Implementation with MPI and CUDA Heterogeneous Computing
+You can da some extra PJ and give a presentation about your PJ to get some extra scores, like implementating Large-Scale Language Model Computation using MapReduce Framework, Parallel Matrix Multiplication Implementation with MPI and CUDA Heterogeneous Computing, ...
 
 
 ## 一些考试题
