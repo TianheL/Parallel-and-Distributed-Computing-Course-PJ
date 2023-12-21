@@ -1,5 +1,5 @@
 # Parallel-and-Distributed-Computing-Course-PJ
-Course PJ of Parallel and Distributed Computing 
+Course PJ of COMP130192 Parallel and Distributed Computing 
 
 Choose two out of the following three projects to complete. I choose the first two, since i don't find suitable test data and i am too lazy to generate test data by myself.😜
 
