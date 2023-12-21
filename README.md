@@ -23,5 +23,6 @@ Choose two out of the following three projects to complete. I choose the first t
 
 ## 一些考试题
 分布式文件系统GFS有哪些部分组成
+
 MapReduce实现Page Rank
 
