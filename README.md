@@ -18,7 +18,7 @@ For details of the implementation, experimental methods, and results, please ref
 
 
 ## PJ-3 Using MapReduce Programming Model to Implement the WordCount Algorithm by Hadoop framework 
-Installing Hadoop is a bit of a hassle, you can use the pre-installed Ubuntu image with Hadoop installed. You can find it [here](https://dblab.xmu.edu.cn/blog/1645/).
+Installing Hadoop is a bit of a hassle, you can use the pre-installed Ubuntu image. You can find it [here](https://dblab.xmu.edu.cn/blog/1645/).
 
 Due to the lack of suitable test data, I didn't choose this PJ.
 
