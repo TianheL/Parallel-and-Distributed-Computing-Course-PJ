@@ -1,4 +1,6 @@
 # PJ-1 OpenMP编程实现并行快速排序算法
+*Read this in [English](README_EN.md)*
+
 这个实验我们使用C++进行OpenMP编程。
 
 ## 实现1
