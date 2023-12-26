@@ -1,10 +1,11 @@
 # PJ-1 OpenMP Implementation of Parallel QuickSort Algorithm
 *Read this in [Chinese](pj1.md)*
 
-这个实验我们使用C++进行OpenMP编程。
+We used C++ for OpenMP programming in this experiment.
 
-## 实现1
-要实现并行快速排序，一种方法是将数组划分成不相交的若干部分交给不同的线程分别进行排序。当每个线程排序好后，我们得到num\_thread个排好序的数组。
+## Implement 1-Parallel Sorting by Manual Partitioning
+
+One way to achieve parallel quicksort is to divide the array into non-overlapping parts and have different threads sort them separately. When each thread has finished sorting, we have num_thread sorted arrays.
 ```cpp
 int* right_idx=new int[thread_num];
 for(int i=0;i<thread_num-1;i++) {
@@ -19,12 +20,12 @@ right_idx[thread_num-1]=right;
 }
 ```
 
-随后的问题便变成对num\_thread个有序数组合并排序的问题。
+The subsequent problem then becomes a problem of merge sorting num_thread ordered arrays.
 ```cpp
 for(int i=0;i<right-left+1;i++){
   b[i]=s_arr[0].val;
   s_arr[0].idx++;
-  if(s_arr[0].idx > s_arr[0].idx_max){
+  if(s_arr[0].idx>s_arr[0].idx_max){
     t_left--;
     for(j=0;j<t_left;j++) 
       s_arr[j]=s_arr[j+1];
@@ -42,8 +43,8 @@ for(int i=0;i<right-left+1;i++){
   }
 }
 ```
-## 实现2-使用task指令动态创建任务
-在快速排序中，在划分数组后，要递归调用sort函数分别去对左右的数组进行排序，一个很自然的想法是对两边并行执行。因此，我们利用\#pragma omp task动态创建一个新任务，去对左边进行排序，原进程对右边进行排序。因此我们可以写出如下的代码：
+## Implement2-Using the *task* Command to Dynamically Create Tasks
+In quicksort, after dividing the array, we need to recursively call the sort function to sort the left and right arrays separately. It's natural to think of doing this in parallel for both sides. Therefore, we use \#pragma omp task to dynamically create a new task to sort the left side, while the original process sorts the right side. As a result, we can write the following code:
 
 ```cpp
 void qsort_parallel(int* arr,int left,int right){
@@ -56,7 +57,7 @@ void qsort_parallel(int* arr,int left,int right){
 }
 ```
 
-需要注意的是在main函数里首次调用并行快速排序函数时，我们需要使用\#pragma omp single，仅让1个线程执行该函数，否则会造成重复调用。
+The key thing to note is that when calling the parallel quicksort function for the first time in the main function, we need to use \#pragma omp single to ensure that only one thread executes the function. Otherwise, it will result in duplicate calls.
 
 ```cpp
 #pragma omp parallel
