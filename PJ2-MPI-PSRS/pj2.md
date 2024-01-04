@@ -1,4 +1,5 @@
 # PJ-2 内存不共享多机环境下Parallel sorting by regular sampling算法
+*Read this in [English](README_EN.md)*
 这个实验我们使用C++和MPI实现Parallel sorting by regular sampling算法。
 
 ## 实现
