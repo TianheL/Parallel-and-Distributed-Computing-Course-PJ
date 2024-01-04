@@ -4,7 +4,7 @@ Course PJ of COMP130192 Parallel and Distributed Computing
 Choose two out of the following three projects to complete. I choose the first two, since i don't find suitable test data and i am too lazy to generate test data by myself.😜
 
 ## TODO
-- [x] Translate to English. (Translate by gpt-3.5-turbo-1106 and check by myself, may have some small mistake)
+- [x] Translate to English. (Translate by gpt-3.5-turbo-1106 and check by myself, may have some small mistake.)
 
 ## PJ-1 OpenMP Implementation of Parallel QuickSort Algorithm
 We use C++ for OpenMP programming in this experiment. 
