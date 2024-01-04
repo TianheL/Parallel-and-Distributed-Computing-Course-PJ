@@ -67,10 +67,10 @@ The key thing to note is that when calling the parallel quicksort function for t
 }
 ```
 
-## 实验方法
-由于clock()计时在并行程序中会有严重的错误，我们换用chrono库进行微秒级定时，并跑500次取平均。
+## Experimental Method
+Due to serious errors with clock() timing in parallel programs, we switch to using the chrono library for microsecond-level timing and run it 500 times to take the average.
 ```cpp
-// 串行
+// Serial
 start=chrono::high_resolution_clock::now();
 qsort_single(arr1,0,arr_size-1);
 end=chrono::high_resolution_clock::now();
@@ -78,7 +78,7 @@ duration=chrono::duration_cast<chrono::microseconds>(end-start);
 time_cost_single+=double(duration.count());
 if(check(arr1,arr_size)==0)
   cout<<"sort error !"<<endl;
-// 并行
+// Parallel
 start=chrono::high_resolution_clock::now();
 #pragma omp parallel
 {
@@ -90,26 +90,26 @@ duration=chrono::duration_cast<chrono::microseconds>(end-start);
 time_cost_parallel+=double(duration.count());
 ```
 
-可通过以下命令进行编译
+You can compile using the following command.
 ```
 g++ lab1-1.cpp -o lab1-1 -fopenmp
 g++ lab1-2.cpp -o lab1-2 -fopenmp
 ```
 
-### 单轮测试
+### Single Round Test
 ```
-./lab1-1 {线程数} {数组长度}
-./lab1-2 {线程数} {数组长度}
+./lab1-1 {Num_Thread} {Array_Length}
+./lab1-2 {Num_Thread} {Array_Length}
 ```
 
-### 多轮测试
+### Multi-Round Test
 ```
 bash lab2-1.sh
 bash lab2-2.sh
 ```
 
-## 实验环境
-我们的实验环境如下图所示。
+## Experiment Environment
+Our experimental environment is shown in the figure below.
 |    CPU    | Intel(R) Core(TM) i7-10700K CPU @ 3.80GHz |
 |:---------:|:------------------------------------------:|
 |   Core    |                     8                      |
@@ -118,22 +118,22 @@ bash lab2-2.sh
 |     OS    |               Ubuntu 20.04.1               |
 | g++ version |                 9.4.0                    |
 
-## 结果
-我们测试了程序在1K、5K、10K、100K、1M、10M等不同数据量以及在2、4、8、16个线程数情况下的加速比，实验结果如下。
+## Result
+We test the program's speedup ratio under different data volumes such as 1K, 5K, 10K, 100K, 1M, 10M, and different thread numbers including 2, 4, 8, and 16. The experimental results are as follows.
 |                   |   1K   |   5K   |   10K  |  100K  |   1M   |   10M  |
 |:-----------------:|:------:|:------:|:------:|:------:|:------:|:------:|
-| 2线程(人工划分)    |  **1.35** |  **1.46** |  **1.47** |  **1.58** |   1.68  |   1.73  |
-| 2线程(动态创建任务)  |   0.37 |   0.86 |   1.11 |   1.57 |  **1.72** |  **1.79** |
-| 4线程(人工划分)    | ***1.64*** | ***1.91*** | ***2.01*** | ***2.28*** |   2.56  |   2.74  |
-| 4线程(动态创建任务)  |   0.30 |   0.53 |   0.87 |   2.20 |  **2.84** |  **3.03** |
-| 8线程(人工划分)    |  **1.29** |  **1.52** |  **1.84** |  **2.26** |   2.81  |   3.24  |
-| 8线程(动态创建任务)  |   0.20 |   0.25 |   0.37 |   1.70 | ***3.31*** | ***3.99*** |
-| 16线程(人工划分)   |  **0.004** |  **0.04** |  **0.06** |  **0.62** |  **1.74** |   2.43  |
-| 16线程(动态创建任务) |   0.003 |   0.02 |   0.05 |   0.40 |   1.32  |  **2.86** |
+| 2线程(Manual Partition)  |  **1.35** |  **1.46** |  **1.47** |  **1.58** |   1.68  |   1.73  |
+| 2线程(Dynamic Task)  |   0.37 |   0.86 |   1.11 |   1.57 |  **1.72** |  **1.79** |
+| 4线程(Manual Partition)    | ***1.64*** | ***1.91*** | ***2.01*** | ***2.28*** |   2.56  |   2.74  |
+| 4线程(Dynamic Task)  |   0.30 |   0.53 |   0.87 |   2.20 |  **2.84** |  **3.03** |
+| 8线程(Manual Partition)    |  **1.29** |  **1.52** |  **1.84** |  **2.26** |   2.81  |   3.24  |
+| 8线程(Dynamic Task)  |   0.20 |   0.25 |   0.37 |   1.70 | ***3.31*** | ***3.99*** |
+| 16线程(Manual Partition)   |  **0.004** |  **0.04** |  **0.06** |  **0.62** |  **1.74** |   2.43  |
+| 16线程(Dynamic Task) |   0.003 |   0.02 |   0.05 |   0.40 |   1.32  |  **2.86** |
 
 
-从以上结果，我们可以得到如下结论：
-1.  在实验测试的数据量下，两种方法的加速比随着数据量的增加而增加，这说明并行程序的额外开销不可忽视。
-2. 在数据量较小的时候，人工划分比动态创建任务的加速比更大，但在数据量较大时，动态创建任务却比人工划分快。我推测可能的原因是动态创建任务总的任务数量大于线程数量，这导致调度的开销在数据量小的时候尤其明显；而人工划分根据我们指定的线程数进行分别排序，不存在任务调度方面的开销，这使得人工划分的加速比在数据量较小的时候比较大。而在数据量较大的时候，动态创建任务在任务调度方面的开销相比计算来说较小，而人工划分的每个线程需要排序的数组长度较长，速度较慢。
-3. 加速比随着线程数增加，有先上升再减少的关系，这可能与过高的线程数导致的额外开销有关。
-4. 在数据量较小的时候，线程数小于等于8时，人工划分的加速比大于1，这与我们印象中不符，且与动态创建任务加速比远小于1形成强烈对比。我们推测可能是1K的数据量并不算小，并行的额外开销相比计算来说并不算大，于是我们减少数据量进行测试，可以发现2线程在150的数据量下加速比小于1，4线程在180的数据量下加速比小于1，8线程在600的数据量下加速比小于1。
+From the above results, we can draw the following conclusions:
+1. Under the experimental test data, the speedup ratio of the two methods increases with the increase of data volume, indicating that the additional overhead of parallel programs cannot be ignored.
+2. When the data volume is small, manual partitioning has a greater speedup ratio than dynamically creating tasks, but when the data volume is large, dynamically creating tasks is faster than manual partitioning. I speculate that the reason may be that the total number of tasks dynamically created is greater than the number of threads, which results in particularly obvious scheduling overhead when the data volume is small; while manual partitioning sorts according to the number of threads we specify, there is no task scheduling overhead, which makes the speedup ratio of manual partitioning relatively large when the data volume is small. However, when the data volume is large, the scheduling overhead of dynamically creating tasks is relatively small compared to the calculations, and each thread of manual partitioning needs to sort a longer array length, resulting in slower speed.
+3. The speedup ratio increases and then decreases as the number of threads increases, which may be related to the additional overhead caused by excessive number of threads.
+4. When the data volume is small, the speedup ratio of manual partitioning is greater than 1 when the number of threads is less than or equal to 8, which is contrary to our impression, and forms a strong contrast with the speedup ratio of dynamically creating tasks far less than 1. We speculate that perhaps a data volume of 1K is not considered small, and the additional overhead of parallelism is not large compared to the calculation, so we reduced the data volume for testing, and found that the speedup ratio of 2 threads at 150 data volume is less than 1, the speedup ratio of 4 threads at 180 data volume is less than 1, and the speedup ratio of 8 threads at 600 data volume is less than 1.
