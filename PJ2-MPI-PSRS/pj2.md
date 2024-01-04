@@ -64,13 +64,13 @@ int proc_id=0;  // 分区所属proc
 int* sendcounts=new int[nprocs]; // 当前进程要发送给其他进程的数据块大小，第i个元素表示当前进程要发送给第i个进程的数据块大小
 memset(sendcounts,0,sizeof(int)*nprocs);     // 分区长度清零
 for(int i=0;i<mySize;i++){
-while (proc_id<nprocs-1 & myArr[i]>sampled_pivots_2[proc_id]) 
-proc_id+=1;     // 找到当前i所属的分区
-if(proc_id==nprocs-1){     
-sendcounts[nprocs-1]=mySize-i;    // 最后一个分区大小
-break;
-}
-sendcounts[proc_id]++;     //i归入所属分区，分区大小+1
+    while (proc_id<nprocs-1 & myArr[i]>sampled_pivots_2[proc_id]) 
+        proc_id+=1;     // 找到当前i所属的分区
+    if(proc_id==nprocs-1){     
+        sendcounts[nprocs-1]=mySize-i;    // 最后一个分区大小
+        break;
+    }
+    sendcounts[proc_id]++;     //i归入所属分区，分区大小+1
 }
 // 得到需要从每个进程接受的数组大小
 MPI_Alltoall(sendcounts,1,MPI_INT,recvcounts,1,MPI_INT,MPI_COMM_WORLD);
@@ -82,8 +82,8 @@ int *sdispls=new int[nprocs];//表示发送缓冲区中每个数据块的偏移�
 sdispls[0]=0; 
 rdispls[0]=0;
 for(int i=1;i<nprocs;i++){
-sdispls[i]=sendcounts[i-1]+sdispls[i-1];
-rdispls[i]=recvcounts[i-1]+rdispls[i-1];
+    sdispls[i]=sendcounts[i-1]+sdispls[i-1];
+    rdispls[i]=recvcounts[i-1]+rdispls[i-1];
 }
 // 分区合并
 MPI_Alltoallv(myArr,sendcounts,sdispls,MPI_INT,*myArr2,recvcounts,rdispls,MPI_INT,MPI_COMM_WORLD);
@@ -98,21 +98,21 @@ delete []sendcounts;
 // 计算每个分区结尾位置+1的位置
 int* myPartEnd=new int[nprocs]; 
 for(int i=1;i<nprocs;i++)
-myPartEnd[i-1]=rdispls[i];
+    myPartEnd[i-1]=rdispls[i];
 myPartEnd[nprocs-1]=mySize2;
 // 归并排序
 int* mySortedArr2=new int[mySize2];
 for(int i=0;i<mySize2;i++){
-int cur_min=INT_MAX; // 当前循环最小值
-int proc_id=-1;  // 当前循环最小值所属分区号
-for(int j=0;j<nprocs;j++){
-if((rdispls[j]<myPartEnd[j]) & (myArr2[rdispls[j]]<=cur_min)){
-    cur_min=myArr2[rdispls[j]];
-    proc_id=j;
-}
-}
-mySortedArr2[i]=cur_min;
-rdispls[proc_id]+=1;
+    int cur_min=INT_MAX; // 当前循环最小值
+    int proc_id=-1;  // 当前循环最小值所属分区号
+    for(int j=0;j<nprocs;j++){
+        if((rdispls[j]<myPartEnd[j]) & (myArr2[rdispls[j]]<=cur_min)){
+            cur_min=myArr2[rdispls[j]];
+            proc_id=j;
+        }
+    }
+    mySortedArr2[i]=cur_min;
+    rdispls[proc_id]+=1;
 }
 delete []myPartEnd;
 // 收集排序好的数组到根进程
@@ -120,9 +120,9 @@ int* recvbuf=new int[nprocs];  //指向根进程的缓冲区的指针,存放所�
 MPI_Gather(&mySize2,1,MPI_INT,recvbuf,1,MPI_INT,0,MPI_COMM_WORLD);
 // 计算根进程的接收缓冲区中每个数据块的偏移量
 if(myId == 0){
-rdispls[0]=0;
-for(int i=1;i<nprocs;i++)
-rdispls[i]=recvbuf[i-1]+rdispls[i-1];
+    rdispls[0]=0;
+    for(int i=1;i<nprocs;i++)
+        rdispls[i]=recvbuf[i-1]+rdispls[i-1];
 }
 MPI_Gatherv(mySortedArr2,mySize2,MPI_INT,arr,recvbuf,rdispls,MPI_INT,0,MPI_COMM_WORLD);
 delete []mySortedArr2;
