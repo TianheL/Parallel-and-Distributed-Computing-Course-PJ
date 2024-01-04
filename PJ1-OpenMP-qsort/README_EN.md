@@ -122,14 +122,14 @@ Our experimental environment is shown in the figure below.
 We test the program's speedup ratio under different data volumes such as 1K, 5K, 10K, 100K, 1M, 10M, and different thread numbers including 2, 4, 8, and 16. The experimental results are as follows.
 |                   |   1K   |   5K   |   10K  |  100K  |   1M   |   10M  |
 |:-----------------:|:------:|:------:|:------:|:------:|:------:|:------:|
-| 2线程(Manual Partition)  |  **1.35** |  **1.46** |  **1.47** |  **1.58** |   1.68  |   1.73  |
-| 2线程(Dynamic Task)  |   0.37 |   0.86 |   1.11 |   1.57 |  **1.72** |  **1.79** |
-| 4线程(Manual Partition)    | ***1.64*** | ***1.91*** | ***2.01*** | ***2.28*** |   2.56  |   2.74  |
-| 4线程(Dynamic Task)  |   0.30 |   0.53 |   0.87 |   2.20 |  **2.84** |  **3.03** |
-| 8线程(Manual Partition)    |  **1.29** |  **1.52** |  **1.84** |  **2.26** |   2.81  |   3.24  |
-| 8线程(Dynamic Task)  |   0.20 |   0.25 |   0.37 |   1.70 | ***3.31*** | ***3.99*** |
-| 16线程(Manual Partition)   |  **0.004** |  **0.04** |  **0.06** |  **0.62** |  **1.74** |   2.43  |
-| 16线程(Dynamic Task) |   0.003 |   0.02 |   0.05 |   0.40 |   1.32  |  **2.86** |
+| 2 Thread(Manual Partition)  |  **1.35** |  **1.46** |  **1.47** |  **1.58** |   1.68  |   1.73  |
+| 2 Thread(Dynamic Task)  |   0.37 |   0.86 |   1.11 |   1.57 |  **1.72** |  **1.79** |
+| 4 Thread(Manual Partition)    | ***1.64*** | ***1.91*** | ***2.01*** | ***2.28*** |   2.56  |   2.74  |
+| 4 Thread(Dynamic Task)  |   0.30 |   0.53 |   0.87 |   2.20 |  **2.84** |  **3.03** |
+| 8 Thread(Manual Partition)    |  **1.29** |  **1.52** |  **1.84** |  **2.26** |   2.81  |   3.24  |
+| 8 Thread(Dynamic Task)  |   0.20 |   0.25 |   0.37 |   1.70 | ***3.31*** | ***3.99*** |
+| 16 Thread(Manual Partition)   |  **0.004** |  **0.04** |  **0.06** |  **0.62** |  **1.74** |   2.43  |
+| 16 Thread(Dynamic Task) |   0.003 |   0.02 |   0.05 |   0.40 |   1.32  |  **2.86** |
 
 
 From the above results, we can draw the following conclusions:
