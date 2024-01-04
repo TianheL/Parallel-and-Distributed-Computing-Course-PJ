@@ -22,7 +22,7 @@ MPI_Scatter(arr,mySize,MPI_INT,myArr,mySize,MPI_INT,0,MPI_COMM_WORLD);
 sort(myArr,myArr+mySize);
 // 正则采样
 for(int i=0;i<nprocs;i++)
-sampled_pivots[i]=myArr[mySize/nprocs*i];
+    sampled_pivots[i]=myArr[mySize/nprocs*i];
 ```
 
 ## Step2:归并排序正则采样数据+正则采样
